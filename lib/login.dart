@@ -177,7 +177,7 @@ class _LoginState extends State<Login> {
               // Botão "Continuar sem cadastro"
               TextButton(
                 onPressed: () {
-                  // Deixe vazio para adicionar a função depois
+                  Navigator.pop(context, true); // volta para a página inicial
                 },
                 child: const Text(
                   'Continuar sem cadastro',
