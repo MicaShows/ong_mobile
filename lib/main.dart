@@ -135,6 +135,13 @@ class _HomePageState extends State<HomePage> {
                       MaterialPageRoute(
                           builder: (context) => DoacaoPage(nomeOng: nomeOng)),
                     );
+                  } else {
+                    // ignore: use_build_context_synchronously
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Você precisa estar logado para doar.'),
+                      ),
+                    );
                   }
                 }
               },
