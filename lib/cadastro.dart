@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter/services.dart';
+
+// ignore: depend_on_referenced_packages
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
 
@@ -23,9 +28,17 @@ class _CadastroState extends State<Cadastro> {
   final TextEditingController _confirmarSenhaController =
       TextEditingController();
 
+  // Máscara para o CEP: 123456-789
+
+  final MaskTextInputFormatter cepMaskFormatter = MaskTextInputFormatter(
+    mask: '#####-###',
+    filter: {"#": RegExp(r'[0-8]')},
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFEFF8F2),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 40),
         child: Form(
@@ -34,46 +47,56 @@ class _CadastroState extends State<Cadastro> {
             children: [
               Image.asset(
                 'images/logongnet.jpg',
-                height: 100,
+                height: 80,
               ),
-
-              const SizedBox(height: 10),
-
+              const SizedBox(height: 8),
               const Text(
                 'Dados pessoais',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF028C3E),
+                ),
               ),
-
+              const SizedBox(height: 10),
               const Text(
                 'Precisamos de algumas informações sobre você.',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                ),
               ),
-
               const SizedBox(height: 20),
-
               _campoComLabelHint(
-                  'Nome completo', 'Digite seu nome completo', _nomeController),
-
-              _campoComLabelHint('CPF', 'Digite seu CPF', _cpfController,
-                  tipo: TextInputType.number),
-
-              _campoComLabelHint('CEP', 'Digite seu CEP', _cepController,
-                  tipo: TextInputType.number),
-
+                  'Nome completo', 'Fulano de Tal', _nomeController),
               _campoComLabelHint(
-                  'E-mail', 'Digite seu e-mail', _emailController,
+                'CPF',
+                '12345678910',
+                _cpfController,
+                tipo: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(11),
+                ],
+              ),
+              _campoComLabelHint(
+                'CEP',
+                '12345-890',
+                _cepController,
+                tipo: TextInputType.number,
+                inputFormatters: [cepMaskFormatter],
+              ),
+              _campoComLabelHint(
+                  'E-mail', 'fulanodetal@gmail.com', _emailController,
                   tipo: TextInputType.emailAddress),
-
               _campoComLabelHint(
-                  'Crie uma senha', 'Digite uma nova senha', _senhaController,
-                  tipo: TextInputType.visiblePassword, isSenha: true),
-
-              _campoComLabelHint('Confirmar nova senha', 'Repita a nova senha',
+                  'Crie uma senha', '***********', _senhaController,
+                  isSenha: true),
+              _campoComLabelHint('Confirmar nova senha', '***********',
                   _confirmarSenhaController,
-                  tipo: TextInputType.visiblePassword, isSenha: true),
-
+                  isSenha: true),
               const SizedBox(height: 20),
-
               SizedBox(
                 width: 200,
                 child: ElevatedButton(
@@ -94,28 +117,31 @@ class _CadastroState extends State<Cadastro> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 0, 67, 122),
+                    backgroundColor: const Color(0xFF028C3E),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: const Text('Cadastrar'),
+                  child: const Text(
+                    'Cadastrar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Botão "Voltar para Login"
-
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Retorna para a tela anterior
+                  Navigator.pop(context);
                 },
                 child: const Text(
-                  'Voltar para Login',
+                  '< Voltar para o login',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 0, 67, 122),
-                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF028C3E),
+                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),
@@ -127,34 +153,50 @@ class _CadastroState extends State<Cadastro> {
   }
 
   Widget _campoComLabelHint(
-      String label, String hint, TextEditingController controller,
-      {TextInputType tipo = TextInputType.text, bool isSenha = false}) {
+    String label,
+    String hint,
+    TextEditingController controller, {
+    TextInputType tipo = TextInputType.text,
+    bool isSenha = false,
+    List<TextInputFormatter>? inputFormatters,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+          ),
           const SizedBox(height: 4),
           TextFormField(
             controller: controller,
             keyboardType: tipo,
             obscureText: isSenha,
+            inputFormatters: inputFormatters,
             decoration: InputDecoration(
               hintText: hint,
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
-                  width: 2,
-                  color: Color.fromARGB(255, 0, 67, 122),
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                  width: 1.5,
+                  color: Color(0xFF007C3A),
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: BorderRadius.circular(10),
               ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(
+              focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
                   width: 2,
-                  color: Color.fromARGB(255, 0, 91, 165),
+                  color: Color(0xFF005F2D),
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
             validator: (value) {

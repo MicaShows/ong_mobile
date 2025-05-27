@@ -1,193 +1,244 @@
 import 'package:flutter/material.dart';
-import 'cadastro.dart'; // Importa a tela de cadastro
+
+import 'package:flutter/services.dart';
+
+import 'cadastro.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
+
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-  // Chave que identifica o formulário e permite validar
   final _formKey = GlobalKey<FormState>();
-  // Controladores para pegar o texto digitado nos campos
+
   final TextEditingController _cpfController = TextEditingController();
+
   final TextEditingController _senhaController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 90, // Altura maior da AppBar
-        backgroundColor: const Color.fromARGB(255, 0, 91, 165),
-        titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 24,
-        ),
-        title: const Text("ONGNET"),
-        centerTitle: true, // Centraliza o título
-      ),
-      body: SingleChildScrollView(
-        // Evita erro de overflow quando o teclado aparece
-        child: Form(
-          key: _formKey, // Associa o formulário à chave
-          child: Column(
-            children: [
-              const SizedBox(height: 30),
-              // Logo da ONG
-              Image.asset(
-                'images/logongnet.jpg', // Ajuste o caminho se necessário
-                height: 120,
-              ),
-              const SizedBox(height: 20),
-              // Campo CPF
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'CPF',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    TextFormField(
-                      controller: _cpfController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'CPF',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Color.fromARGB(255, 0, 67, 122),
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Color.fromARGB(255, 0, 91, 165),
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira o CPF';
-                        }
+      backgroundColor: const Color(0xFFEFFAF0), // Fundo verde claro
 
-                        return null;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              // Campo Senha
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Senha',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    TextFormField(
-                      controller: _senhaController,
-                      keyboardType: TextInputType.visiblePassword,
-                      obscureText: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Senha',
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Color.fromARGB(255, 0, 67, 122),
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            width: 2,
-                            color: Color.fromARGB(255, 0, 91, 165),
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira a senha';
-                        }
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Image.asset(
+                  'images/logongnet.jpg', // Ajuste conforme seu logo
 
-                        return null;
-                      },
-                    ),
-                  ],
+                  height: 80,
                 ),
-              ),
-              const SizedBox(height: 20),
-              // Botão "Entrar"
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Verifica se todos os campos estão validados
-                    if (_formKey.currentState!.validate()) {
-                      // Mostra uma mensagem de sucesso
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Campos válidos!')),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 0, 67, 122),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: const Text('Entrar'),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Texto "OU"
-              const Text('OU', style: TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 10),
-              // Botão "Cadastre-se"
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Cadastro()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 0, 67, 122),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  child: const Text('Cadastre-se'),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Botão "Continuar sem cadastro"
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context, false); // volta para a página inicial
-                },
-                child: const Text(
-                  'Continuar sem cadastro',
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Bem-vindo (a) de volta.',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 0, 67, 122),
+                    color: Color(0xFF028C3E), // Verde escuro
+
                     fontWeight: FontWeight.bold,
+
+                    fontSize: 18,
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(height: 10),
+
+                const Text(
+                  'Preencha seus dados para continuar.',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 14,
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // CPF
+
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'CPF',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                TextFormField(
+                  controller: _cpfController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 11,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  decoration: InputDecoration(
+                    counterText: "", // Oculta o contador de caracteres
+
+                    hintText: '123.456.789-10',
+
+                    filled: true,
+
+                    fillColor: Colors.white,
+
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira o CPF';
+                    } else if (value.length != 11) {
+                      return 'O CPF deve ter 11 números';
+                    }
+
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                // Senha
+
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Senha',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                TextFormField(
+                  controller: _senhaController,
+                  keyboardType: TextInputType.visiblePassword,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: '***********',
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, insira a senha';
+                    }
+
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 10),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton(
+                    onPressed: () {
+                      // Ação de esqueci a senha
+                    },
+                    child: const Text(
+                      'Esqueceu a senha?',
+                      style: TextStyle(
+                        color: Color(0xFF065A26),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Botão "Entrar"
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Campos válidos!')),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF028C3E),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text(
+                      'Entrar',
+                      style: TextStyle(
+                        color: Colors.white, // Texto branco
+
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 10),
+
+                const Text('ou'),
+
+                const SizedBox(height: 10),
+
+                // Botão "Cadastre-se"
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const Cadastro()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF028C3E),
+                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cadastre-se',
+                      style: TextStyle(
+                        color: Colors.white, // Texto branco
+
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                // Botão "Continuar sem cadastro"
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, true); // volta para a página inicial
+                  },
+                  child: const Text(
+                    'Continuar sem cadastro',
+                    style: TextStyle(
+                      color: Color(0xFF028C3E),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
