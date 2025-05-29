@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
 
-// ignore: depend_on_referenced_packages
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import "package:mask_text_input_formatter/mask_text_input_formatter.dart";
 
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
