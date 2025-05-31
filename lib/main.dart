@@ -8,6 +8,8 @@ import 'login.dart';
 
 import 'usuario.dart';
 
+import 'ongs_por_estado.dart';
+
 bool isLoggedIn = false;
 
 void main() async {
@@ -46,6 +48,37 @@ class Ong {
     required this.telefone,
   });
 }
+
+List<Ong> get allOngs => [
+      Ong(
+        nome: 'ONG Viver Mais',
+        endereco: 'Av. Itapuí, 325 - Jardim Belaura, Bauru - SP, 00034-210',
+        missao:
+            'Acolher moradores de rua e pessoas em situação de vulnerabilidade socioeconômica.',
+        atividades:
+            '- Ações de Assistência Básica\n- Refeições, kits de higiene e roupas',
+        email: 'ong.vivermais@gmail.com',
+        telefone: '(11) 1234-6789',
+      ),
+      Ong(
+        nome: 'Saúde Natureza',
+        endereco: 'Jardins, SP, Centro, CEP 67854321',
+        missao:
+            'Melhorar as condições do meio ambiente através de ações e medidas sustentáveis.',
+        atividades:
+            '- Educação Ambiental\n- Reflorestamento\n- Coleta seletiva e reciclagem',
+        email: 'ong.vivernmais@gmail.com',
+        telefone: '(11) 1234-6789',
+      ),
+      Ong(
+        nome: 'Ajuda Animal',
+        endereco: 'Rua das Flores, 123, São Paulo - SP',
+        missao: 'Proteger animais em situação de risco.',
+        atividades: '- Resgate\n- Adoção\n- Campanhas de conscientização',
+        email: 'ajuda.animal@gmail.com',
+        telefone: '(11) 9876-5432',
+      ),
+    ];
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -99,6 +132,7 @@ class _HomePageState extends State<HomePage> {
     _searchController.addListener(filterOngs);
   }
 
+
   void filterOngs() {
     final query = _searchController.text.toLowerCase();
 
@@ -110,21 +144,39 @@ class _HomePageState extends State<HomePage> {
   }
 
   Drawer _buildDrawer() {
+    List<String> estados = [
+      'Acre - AC',
+      'Alagoas - AL',
+      'Amazonas - AM',
+      'Bahia - BA',
+      'Ceara - CE',
+      'GO',
+      'São Paulo - SP'
+    ]; // adicione mais se quiser
+
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
-        children: const [
-          DrawerHeader(
+        children: [
+          const DrawerHeader(
             decoration: BoxDecoration(color: Color(0xFF028C3E)),
             child: Text('ONGs por Estado',
                 style: TextStyle(color: Colors.white, fontSize: 24)),
           ),
-          ListTile(title: Text('AC')),
-          ListTile(title: Text('AL')),
-          ListTile(title: Text('AM')),
-          ListTile(title: Text('BA')),
-          ListTile(title: Text('CE')),
-          ListTile(title: Text('GO')),
+          ...estados.map((sigla) {
+            return ListTile(
+              title: Text(sigla),
+              onTap: () {
+                Navigator.pop(context); // Fecha o menu
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OngsPorEstadoPage(estado: sigla),
+                  ),
+                );
+              },
+            );
+          }).toList(),
         ],
       ),
     );
@@ -313,3 +365,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+// ignore: non_constant_identifier_names
+OngsPorEstado({required String estado}) {}
