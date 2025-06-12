@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'info_usuario.dart';
+import 'doacoes_usuario.dart';
+import 'seguranca.dart';
+import 'outras_opcoes.dart';
+import 'sobre_nos.dart';
 
 class UsuarioPage extends StatelessWidget {
   const UsuarioPage({super.key});
 
   Future<void> _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-
     await prefs.setBool('isLoggedIn', false);
-
-    Navigator.pop(context); // volta à tela anterior
+    if (context.mounted) Navigator.pop(context);
   }
 
   @override
@@ -22,51 +25,41 @@ class UsuarioPage extends StatelessWidget {
         backgroundColor: primaryGreen,
         title: const Text('ONGNET', style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        iconTheme:
+            const IconThemeData(color: Colors.white), // seta de voltar branca
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            const CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.black,
-              child: Icon(Icons.person, size: 60, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            const Text('Editar Foto',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 30),
-            buildButton('Informações do Usuário', primaryGreen),
-            buildButton('Doações', primaryGreen),
-            buildButton('Segurança e Conta', primaryGreen),
-            buildButton('Outras Opções', primaryGreen),
-            buildButton('Sobre Nós', primaryGreen),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () => _logout(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-              ),
-              child: const Text('Sair', style: TextStyle(color: Colors.white)),
-            ),
-            const SizedBox(height: 40),
             Image.asset(
-              'assets/logo.png',
+              'logoongnet2.jpg',
               height: 80,
             ),
+            const SizedBox(height: 20),
+            const SizedBox(height: 30),
+            buildButton(context, 'Informações do Usuário', primaryGreen,
+                const InfoUsuarioPage()),
+            buildButton(context, 'Doações', primaryGreen, const DoacoesPage()),
+            buildButton(context, 'Segurança e Conta', primaryGreen,
+                const SegurancaPage()),
+            buildButton(context, 'Outras Opções', primaryGreen,
+                const OutrasOpcoesPage()),
+            buildButton(
+                context, 'Sobre Nós', primaryGreen, const SobreNosPage()),
+            const SizedBox(height: 30),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget buildButton(String text, Color color) {
+  Widget buildButton(
+      BuildContext context, String text, Color color, Widget page) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: SizedBox(
-        width: 250,
+        width: 500,
         height: 40,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -74,7 +67,10 @@ class UsuarioPage extends StatelessWidget {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           ),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => page));
+          },
           child: Text(text, style: const TextStyle(color: Colors.white)),
         ),
       ),

@@ -45,7 +45,7 @@ class _CadastroState extends State<Cadastro> {
           child: Column(
             children: [
               Image.asset(
-                'images/logongnet.jpg',
+                'images/logoongnet2.jpg',
                 height: 80,
               ),
               const SizedBox(height: 8),

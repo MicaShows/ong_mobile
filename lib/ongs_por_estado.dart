@@ -1,73 +1,81 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import 'package:ong_mobile/model/model_ong.dart';
 
 class OngsPorEstadoPage extends StatefulWidget {
   final String estado;
+  final List<Ong> todasOngs;
 
-  const OngsPorEstadoPage({super.key, required this.estado});
+  const OngsPorEstadoPage({
+    super.key,
+    required this.estado,
+    required this.todasOngs,
+  });
 
   @override
   State<OngsPorEstadoPage> createState() => _OngsPorEstadoPageState();
 }
 
 class _OngsPorEstadoPageState extends State<OngsPorEstadoPage> {
-  final TextEditingController _cepController = TextEditingController();
-  List<Ong> ongsFiltradas = [];
+  final TextEditingController _searchController = TextEditingController();
+  late List<Ong> ongsDoEstado;
+  late List<Ong> ongsFiltradas;
 
-  void buscarOngsPorCep() {
-    final cepDigitado = _cepController.text.trim();
+  @override
+  void initState() {
+    super.initState();
 
-    if (cepDigitado.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Digite um CEP para buscar.')),
-      );
-      return;
-    }
+    // Filtra as ONGs pelo estado selecionado
+    ongsDoEstado = widget.todasOngs.where((ong) {
+      return ong.endereco.toUpperCase().contains(widget.estado.toUpperCase());
+    }).toList();
 
-    setState(() {
-      ongsFiltradas = allOngs.where((ong) {
-        final endereco = ong.endereco
-            .replaceAll(RegExp(r'\D'), ''); // remove caracteres não numéricos
-        return endereco.contains(cepDigitado);
-      }).toList();
+    ongsFiltradas = List.from(ongsDoEstado);
+
+    _searchController.addListener(() {
+      final query = _searchController.text.toLowerCase();
+      setState(() {
+        ongsFiltradas = ongsDoEstado.where((ong) {
+          return ong.nome.toLowerCase().contains(query);
+        }).toList();
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ONGs em ${widget.estado}',
-            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: Text('ONGs em ${widget.estado}'),
         backgroundColor: const Color(0xFF028C3E),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
-              controller: _cepController,
-              keyboardType: TextInputType.number,
+              controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Digite o CEP',
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                prefixIcon:
-                    const Icon(Icons.location_on, color: Color(0xFF028C3E)),
+                hintText: 'Digite o nome da ONG',
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF028C3E)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
             const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: buscarOngsPorCep,
-              icon: const Icon(Icons.search),
-              label: const Text('Buscar ONGs próximas'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF028C3E),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25)),
-              ),
+            const Text(
+              '\u00a0\u00a0\u00a0\u00a0As ONGs (Organizações Não Governamentais) são entidades privadas da sociedade civil, sem fins lucrativos, que se dedicam à promoção de diversas causas, como direitos humanos, meio ambiente, educação, saúde, entre outras. Elas fazem parte do chamado terceiro setor, juntamente com associações de classe e instituições religiosas, e têm um papel relevante no fortalecimento da cidadania e da justiça social.\n\n'
+              '\u00a0\u00a0\u00a0\u00a0Essas organizações atuam de forma complementar ao poder público, buscando suprir lacunas deixadas pelo Estado na oferta de serviços essenciais à população. Por meio de projetos, campanhas e ações diretas, as ONGs contribuem para o desenvolvimento social, a inclusão de grupos vulneráveis e a promoção de políticas públicas mais justas e eficazes.\n\n'
+              '\u00a0\u00a0\u00a0\u00a0O funcionamento das ONGs é impulsionado pelo engajamento de pessoas comprometidas com a transformação social. Por não terem fins lucrativos, elas dependem do apoio financeiro de empresas, doações de pessoas físicas e, em alguns casos, de repasses governamentais. Esse apoio é essencial para a continuidade e o impacto de suas atividades.',
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -84,11 +92,14 @@ class _OngsPorEstadoPageState extends State<OngsPorEstadoPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(ong.nome,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF028C3E))),
+                                Text(
+                                  ong.nome,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF028C3E),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
                                 Text('Endereço: ${ong.endereco}'),
                                 const SizedBox(height: 4),

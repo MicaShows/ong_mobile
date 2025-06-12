@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'doacao.dart';
-
+import 'doacao_page.dart';
 import 'login.dart';
-
 import 'usuario.dart';
-
-import 'ongs_por_estado.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'model/model_ong.dart';
 
 bool isLoggedIn = false;
 
@@ -16,7 +13,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-
   isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
   runApp(const MaterialApp(
@@ -25,60 +21,6 @@ void main() async {
     debugShowCheckedModeBanner: false,
   ));
 }
-
-class Ong {
-  final String nome;
-
-  final String endereco;
-
-  final String missao;
-
-  final String atividades;
-
-  final String email;
-
-  final String telefone;
-
-  Ong({
-    required this.nome,
-    required this.endereco,
-    required this.missao,
-    required this.atividades,
-    required this.email,
-    required this.telefone,
-  });
-}
-
-List<Ong> get allOngs => [
-      Ong(
-        nome: 'ONG Viver Mais',
-        endereco: 'Av. Itapuí, 325 - Jardim Belaura, Bauru - SP, 00034-210',
-        missao:
-            'Acolher moradores de rua e pessoas em situação de vulnerabilidade socioeconômica.',
-        atividades:
-            '- Ações de Assistência Básica\n- Refeições, kits de higiene e roupas',
-        email: 'ong.vivermais@gmail.com',
-        telefone: '(11) 1234-6789',
-      ),
-      Ong(
-        nome: 'Saúde Natureza',
-        endereco: 'Jardins, SP, Centro, CEP 67854321',
-        missao:
-            'Melhorar as condições do meio ambiente através de ações e medidas sustentáveis.',
-        atividades:
-            '- Educação Ambiental\n- Reflorestamento\n- Coleta seletiva e reciclagem',
-        email: 'ong.vivernmais@gmail.com',
-        telefone: '(11) 1234-6789',
-      ),
-      Ong(
-        nome: 'Ajuda Animal',
-        endereco: 'Rua das Flores, 123, São Paulo - SP',
-        missao: 'Proteger animais em situação de risco.',
-        atividades: '- Resgate\n- Adoção\n- Campanhas de conscientização',
-        email: 'ajuda.animal@gmail.com',
-        telefone: '(11) 9876-5432',
-      ),
-    ];
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -90,52 +32,41 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
 
-  List<Ong> ongs = [
-    Ong(
-      nome: 'ONG Viver Mais',
-      endereco: 'Av. Itapuí, 325 - Jardim Belaura, Bauru - SP, 00034-210',
-      missao:
-          'Acolher moradores de rua e pessoas em situação de vulnerabilidade socioeconômica.',
-      atividades:
-          '- Ações de Assistência Básica\n- Refeições, kits de higiene e roupas',
-      email: 'ong.vivermais@gmail.com',
-      telefone: '(11) 1234-6789',
-    ),
-    Ong(
-      nome: 'Saúde Natureza',
-      endereco: 'Jardins, SP, Centro, CEP 67854321',
-      missao:
-          'Melhorar as condições do meio ambiente através de ações e medidas sustentáveis.',
-      atividades:
-          '- Educação Ambiental\n- Reflorestamento\n- Coleta seletiva e reciclagem',
-      email: 'ong.vivernmais@gmail.com',
-      telefone: '(11) 1234-6789',
-    ),
-    Ong(
-      nome: 'Ajuda Animal',
-      endereco: 'Rua das Flores, 123, São Paulo - SP',
-      missao: 'Proteger animais em situação de risco.',
-      atividades: '- Resgate\n- Adoção\n- Campanhas de conscientização',
-      email: 'ajuda.animal@gmail.com',
-      telefone: '(11) 9876-5432',
-    ),
-  ];
-
+  List<Ong> ongs = [];
   List<Ong> filteredOngs = [];
+
+  bool mostrandoEstado = false;
+
+  Future<void> carregaOngs() async {
+    final url = Uri.parse('http://localhost:8686/api/v1/representante-ong/ong');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+
+        setState(() {
+          ongs = jsonData.map((data) => Ong.fromJson(data)).toList();
+          filteredOngs = ongs;
+        });
+      } else {
+        print('Erro na resposta: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Erro ao buscar ONGs: $e');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-
-    filteredOngs = ongs;
-
+    carregaOngs();
     _searchController.addListener(filterOngs);
   }
 
-
   void filterOngs() {
     final query = _searchController.text.toLowerCase();
-
     setState(() {
       filteredOngs = ongs.where((ong) {
         return ong.nome.toLowerCase().contains(query);
@@ -144,15 +75,35 @@ class _HomePageState extends State<HomePage> {
   }
 
   Drawer _buildDrawer() {
-    List<String> estados = [
-      'Acre - AC',
-      'Alagoas - AL',
-      'Amazonas - AM',
-      'Bahia - BA',
-      'Ceara - CE',
-      'GO',
-      'São Paulo - SP'
-    ]; // adicione mais se quiser
+    final Map<String, String> estados = {
+      'ACRE': 'AC',
+      'ALAGOAS': 'AL',
+      'AMAPÁ': 'AP',
+      'AMAZONAS': 'AM',
+      'BAHIA': 'BA',
+      'CEARÁ': 'CE',
+      'DISTRITO FEDERAL': 'DF',
+      'ESPIRITO SANTO': 'ES',
+      'GOIÁS': 'GO',
+      'MARANHÃO': 'MA',
+      'MATO GROSSO': 'MT',
+      'MATO GROSSO DO SUL': 'MS',
+      'MINAS GERAIS': 'MG',
+      'PARÁ': 'PA',
+      'PARAÍBA': 'PB',
+      'PARANÁ': 'PR',
+      'PERNAMBUCO': 'PE',
+      'PIAUÍ': 'PI',
+      'RIO DE JANEIRO': 'RJ',
+      'RIO GRANDE DO NORTE': 'RN',
+      'RIO GRANDE DO SUL': 'RS',
+      'RONDÔNIA': 'RO',
+      'RORAIMA': 'RR',
+      'SANTA CATARINA': 'SC',
+      'SÃO PAULO': 'SP',
+      'SERGIPE': 'SE',
+      'TOCANTINS': 'TO',
+    };
 
     return Drawer(
       child: ListView(
@@ -160,23 +111,41 @@ class _HomePageState extends State<HomePage> {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(color: Color(0xFF028C3E)),
-            child: Text('ONGs por Estado',
-                style: TextStyle(color: Colors.white, fontSize: 24)),
+            child: Text(
+              'ONGs por Estado',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
           ),
-          ...estados.map((sigla) {
-            return ListTile(
-              title: Text(sigla),
-              onTap: () {
-                Navigator.pop(context); // Fecha o menu
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OngsPorEstadoPage(estado: sigla),
-                  ),
-                );
-              },
-            );
-          }).toList(),
+          ListTile(
+            title: const Text('TODOS OS ESTADOS',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            leading: const Icon(Icons.public, color: Color(0xFF028C3E)),
+            onTap: () {
+              Navigator.pop(context);
+              setState(() {
+                filteredOngs = ongs;
+                _searchController.clear();
+                mostrandoEstado = false;
+              });
+            },
+          ),
+          const Divider(),
+          ...estados.entries.map((entry) => ListTile(
+                title: Text(entry.key),
+                onTap: () {
+                  Navigator.pop(context);
+                  final ufSelecionada = entry.value;
+
+                  setState(() {
+                    filteredOngs = ongs
+                        .where((ong) =>
+                            ong.uf.toUpperCase() == ufSelecionada.toUpperCase())
+                        .toList();
+                    _searchController.clear();
+                    mostrandoEstado = true;
+                  });
+                },
+              )),
         ],
       ),
     );
@@ -263,7 +232,6 @@ class _HomePageState extends State<HomePage> {
 
                 if (result == true) {
                   setState(() => isLoggedIn = true);
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -317,10 +285,8 @@ class _HomePageState extends State<HomePage> {
               } else {
                 final result = await Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const Login()));
-
                 if (result == true) {
                   setState(() => isLoggedIn = true);
-
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -351,20 +317,37 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: filteredOngs.isNotEmpty
-                  ? ListView.builder(
-                      itemCount: filteredOngs.length,
-                      itemBuilder: (context, index) =>
-                          _buildOngCard(filteredOngs[index]),
-                    )
-                  : const Center(child: Text('Nenhuma ONG encontrada.')),
+              child: ListView(
+                children: [
+                  if (mostrandoEstado)
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      child: Text(
+                        '\u00a0\u00a0\u00a0\u00a0As ONGs (Organizações Não Governamentais) são entidades privadas da sociedade civil, sem fins lucrativos, que se dedicam à promoção de diversas causas, como direitos humanos, meio ambiente, educação, saúde, entre outras. Elas fazem parte do chamado terceiro setor, juntamente com associações de classe e instituições religiosas, e têm um papel relevante no fortalecimento da cidadania e da justiça social.\n\n'
+                        '\u00a0\u00a0\u00a0\u00a0Essas organizações atuam de forma complementar ao poder público, buscando suprir lacunas deixadas pelo Estado na oferta de serviços essenciais à população. Por meio de projetos, campanhas e ações diretas, as ONGs contribuem para o desenvolvimento social, a inclusão de grupos vulneráveis e a promoção de políticas públicas mais justas e eficazes.\n\n'
+                        '\u00a0\u00a0\u00a0\u00a0O funcionamento das ONGs é impulsionado pelo engajamento de pessoas comprometidas com a transformação social. Por não terem fins lucrativos, elas dependem do apoio financeiro de empresas, doações de pessoas físicas e, em alguns casos, de repasses governamentais. Esse apoio é essencial para a continuidade e o impacto de suas atividades.',
+                        style: TextStyle(fontSize: 16),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                  if (filteredOngs.isNotEmpty)
+                    ...filteredOngs.map(_buildOngCard).toList()
+                  else
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 32.0),
+                        child: Text('Nenhuma ONG encontrada.'),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
-}
 
-// ignore: non_constant_identifier_names
-OngsPorEstado({required String estado}) {}
+  // dummy função para manter compatibilidade
+  OngsPorEstadoPage({required String estado}) {}
+}

@@ -31,7 +31,7 @@ class _LoginState extends State<Login> {
             child: Column(
               children: [
                 Image.asset(
-                  'images/logongnet.jpg', // Ajuste conforme seu logo
+                  'images/logoongnet2.jpg', // Ajuste conforme seu logo
 
                   height: 80,
                 ),
@@ -227,7 +227,7 @@ class _LoginState extends State<Login> {
                 // Botão "Continuar sem cadastro"
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context, false); // volta para a página inicial
+                    Navigator.pop(context, true); // volta para a página inicial
                   },
                   child: const Text(
                     'Continuar sem cadastro',
