@@ -10,6 +10,7 @@ import 'sobre_nos.dart';
 class UsuarioPage extends StatelessWidget {
   const UsuarioPage({super.key});
 
+  // ignore: unused_element
   Future<void> _logout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
@@ -31,11 +32,11 @@ class UsuarioPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Image.asset(
-              'logoongnet2.jpg',
-              height: 80,
-            ),
             const SizedBox(height: 20),
+            Image.asset(
+              'images/logo.jpg',
+              height: 200,
+            ),
             const SizedBox(height: 30),
             buildButton(context, 'Informações do Usuário', primaryGreen,
                 const InfoUsuarioPage()),

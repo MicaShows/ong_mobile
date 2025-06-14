@@ -15,7 +15,7 @@ class SenhaAlteradaPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('images/logoongnet2.jpg', height: 100),
+              Image.asset('images/logo.jpg', height: 100),
               const SizedBox(height: 30),
               const Icon(Icons.lock_open, size: 60, color: Color(0xFF028C3E)),
               const SizedBox(height: 20),

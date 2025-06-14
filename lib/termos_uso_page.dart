@@ -15,10 +15,10 @@ class TermosUsoPage extends StatelessWidget {
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: const Padding(
+        padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
-          child: const Text(
+          child: Text(
             'Este aplicativo é fornecido pela ONGNET com o objetivo de conectar doadores a ONGs confiáveis. '
             'Ao utilizar este aplicativo, você concorda com os seguintes termos de uso:\n\n'
             '\u00a0\u00a0\u00a0\u00a01. Suas informações pessoais serão protegidas conforme nossa política de privacidade.\n\n'

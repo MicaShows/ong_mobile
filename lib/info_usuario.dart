@@ -8,8 +8,18 @@ class InfoUsuarioPage extends StatefulWidget {
 }
 
 class _InfoUsuarioPageState extends State<InfoUsuarioPage> {
+  // Avatar selecionado
+  String _avatarSelecionado = 'assets/avatars/avatar1.png';
+
+  final List<String> _avatares = [
+    'assets/avatars/avatar1.png',
+    'assets/avatars/avatar2.png',
+    'assets/avatars/avatar3.png',
+  ];
+
+  // Controladores dos campos
   final TextEditingController nomeController =
-      TextEditingController(text: 'Nome do Usuário'); // Exemplo fixo
+      TextEditingController(text: 'Nome do Usuário');
   final TextEditingController emailController =
       TextEditingController(text: 'usuario@email.com');
   final TextEditingController telefoneController = TextEditingController();
@@ -21,77 +31,34 @@ class _InfoUsuarioPageState extends State<InfoUsuarioPage> {
   final TextEditingController cidadeController = TextEditingController();
   final TextEditingController estadoController = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.green[800],
-        leading: const BackButton(color: Colors.white),
-        title: const Text('ONGNET', style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
+  void _mostrarEscolhaDeAvatar() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => GridView.builder(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            const CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.black,
-              child: Icon(Icons.person, size: 50, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            const Text('Editar Foto', style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 20),
-
-            // Campos de informações
-            _buildTextField('Nome completo', nomeController, enabled: false),
-            _buildTextField('E-mail', emailController, enabled: false),
-            _buildTextField('Telefone', telefoneController,
-                keyboardType: TextInputType.phone),
-            _buildTextField('CPF (opcional)', cpfController,
-                keyboardType: TextInputType.number),
-
-            const SizedBox(height: 20),
-            const Divider(),
-            const SizedBox(height: 10),
-            const Text('Endereço',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            _buildTextField('CEP', cepController,
-                keyboardType: TextInputType.number),
-            _buildTextField('Rua', ruaController),
-            _buildTextField('Número', numeroController,
-                keyboardType: TextInputType.number),
-            _buildTextField('Complemento', complementoController),
-            _buildTextField('Cidade', cidadeController),
-            _buildTextField('Estado', estadoController),
-
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: BorderSide(color: Colors.green[800]!),
-                  ),
-                ),
-                onPressed: _salvarInformacoes,
-                child: Text(
-                  'Salvar',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.green[800],
-                  ),
-                ),
-              ),
-            ),
-          ],
+        itemCount: _avatares.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
+        itemBuilder: (context, index) {
+          final avatar = _avatares[index];
+          return GestureDetector(
+            onTap: () {
+              setState(() => _avatarSelecionado = avatar);
+              Navigator.pop(context);
+            },
+            child: Image.asset(avatar),
+          );
+        },
       ),
+    );
+  }
+
+  void _salvarInformacoes() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Informações salvas com sucesso')),
     );
   }
 
@@ -121,9 +88,75 @@ class _InfoUsuarioPageState extends State<InfoUsuarioPage> {
     );
   }
 
-  void _salvarInformacoes() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Informações salvas com sucesso')),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.green[800],
+        leading: const BackButton(color: Colors.white),
+        title: const Text('ONGNET', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage(_avatarSelecionado),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: _mostrarEscolhaDeAvatar,
+              child: const Text(
+                'Editar Foto',
+                style: TextStyle(fontSize: 16, color: Colors.black87),
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildTextField('Nome completo', nomeController, enabled: false),
+            _buildTextField('E-mail', emailController, enabled: false),
+            _buildTextField('Telefone', telefoneController,
+                keyboardType: TextInputType.phone),
+            _buildTextField('CPF (opcional)', cpfController,
+                keyboardType: TextInputType.number),
+            const SizedBox(height: 20),
+            const Divider(),
+            const SizedBox(height: 10),
+            const Text('Endereço',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            _buildTextField('CEP', cepController,
+                keyboardType: TextInputType.number),
+            _buildTextField('Rua', ruaController),
+            _buildTextField('Número', numeroController,
+                keyboardType: TextInputType.number),
+            _buildTextField('Complemento', complementoController),
+            _buildTextField('Cidade', cidadeController),
+            _buildTextField('Estado', estadoController),
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: BorderSide(color: Colors.green[800]!),
+                  ),
+                ),
+                onPressed: _salvarInformacoes,
+                child: Text(
+                  'Salvar',
+                  style: TextStyle(fontSize: 16, color: Colors.green[800]),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
