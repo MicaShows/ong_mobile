@@ -16,7 +16,7 @@ class CodigoVerificacaoPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('images/logo.jpg', height: 100), // sua logo
+              Image.asset('images/logoprincipal.jpg', height: 100), // sua logo
               const SizedBox(height: 20),
               const Text(
                 'Código de verificação enviado!',

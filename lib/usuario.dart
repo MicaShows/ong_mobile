@@ -34,7 +34,7 @@ class UsuarioPage extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
             Image.asset(
-              'images/logo.jpg',
+              'images/logoprincipal.jpg',
               height: 200,
             ),
             const SizedBox(height: 30),

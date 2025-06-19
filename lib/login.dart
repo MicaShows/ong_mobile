@@ -31,7 +31,7 @@ class _LoginState extends State<Login> {
             child: Column(
               children: [
                 Image.asset(
-                  'images/logo.jpg', // Ajuste conforme seu logo
+                  'images/logoprincipal.jpg', // Ajuste conforme seu logo
 
                   height: 200,
                 ),

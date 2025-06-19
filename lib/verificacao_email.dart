@@ -15,7 +15,7 @@ class VerificacaoEmailPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/logo.png', height: 100), // sua logo
+              Image.asset('images/logoprincipal.jpg', height: 100), // sua logo
               const SizedBox(height: 20),
               const Text(
                 'Nós precisamos do seu e-mail',

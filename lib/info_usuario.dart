@@ -9,12 +9,18 @@ class InfoUsuarioPage extends StatefulWidget {
 
 class _InfoUsuarioPageState extends State<InfoUsuarioPage> {
   // Avatar selecionado
-  String _avatarSelecionado = 'assets/avatars/avatar1.png';
+  String _avatarSelecionado = 'images/avatarhomem1.jpg';
+
+  // Controle do hover
+  bool _isHovering = false;
 
   final List<String> _avatares = [
-    'assets/avatars/avatar1.png',
-    'assets/avatars/avatar2.png',
-    'assets/avatars/avatar3.png',
+    'images/avatarhomem1.jpg',
+    'images/avatarhomem2.jpg',
+    'images/avatarhomem3.jpg',
+    'images/avatarmulher1.jpg',
+    'images/avatarmulher2.jpg',
+    'images/avatarmulher3.jpg',
   ];
 
   // Controladores dos campos
@@ -108,11 +114,28 @@ class _InfoUsuarioPageState extends State<InfoUsuarioPage> {
               backgroundImage: AssetImage(_avatarSelecionado),
             ),
             const SizedBox(height: 10),
-            GestureDetector(
-              onTap: _mostrarEscolhaDeAvatar,
-              child: const Text(
-                'Editar Foto',
-                style: TextStyle(fontSize: 16, color: Colors.black87),
+            MouseRegion(
+              onEnter: (_) => setState(() => _isHovering = true),
+              onExit: (_) => setState(() => _isHovering = false),
+              child: GestureDetector(
+                onTap: _mostrarEscolhaDeAvatar,
+                child: Text(
+                  'Editar Foto',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black87,
+                    decoration: TextDecoration.underline,
+                    shadows: _isHovering
+                        ? [
+                            Shadow(
+                              offset: Offset(1.5, 1.5),
+                              blurRadius: 3.0,
+                              color: Colors.grey.withOpacity(0.6),
+                            ),
+                          ]
+                        : [],
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 20),
