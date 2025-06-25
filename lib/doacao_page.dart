@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'main.dart';
 import 'usuario.dart';
+import 'doar_presencial.dart'; // Import da tela de doação presencial
 
 class DoacaoItensPage extends StatefulWidget {
   final String nomeOng;
@@ -45,13 +46,10 @@ class _DoacaoItensPageState extends State<DoacaoItensPage> {
               title: const Text('Início'),
               onTap: () {
                 Navigator.pop(context);
-
                 Navigator.pushAndRemoveUntil(
                   context,
-
                   MaterialPageRoute(builder: (context) => const HomePage()),
-
-                  (route) => false, // Remove todas as rotas anteriores
+                  (route) => false,
                 );
               },
             ),
@@ -170,7 +168,17 @@ class _DoacaoItensPageState extends State<DoacaoItensPage> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _selecionado != null ? () {} : null,
+              onPressed: _selecionado != null
+                  ? () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              DoarPresencialPage(nomeOng: widget.nomeOng),
+                        ),
+                      );
+                    }
+                  : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF005A2D),
                 disabledBackgroundColor: Colors.grey,
@@ -189,7 +197,7 @@ class _DoacaoItensPageState extends State<DoacaoItensPage> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _selecionado != null ? () {} : null,
+              onPressed: _selecionado != null ? () {} : null, // ação futura
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF005A2D),
                 disabledBackgroundColor: Colors.grey,
