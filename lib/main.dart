@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   bool mostrandoEstado = false;
 
   Future<void> carregaOngs() async {
-    final url = Uri.parse('http://localhost:8686/api/v1/representante-ong/ong');
+    final url = Uri.parse('http://localhost:8686/api/v1/doador/ong');
 
     try {
       final response = await http.get(url);

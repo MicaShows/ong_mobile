@@ -19,13 +19,13 @@ class DoarPresencialPage extends StatelessWidget {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
+      body: const Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 50,
                 backgroundColor: Color(0xFFE6EFE9),
                 child: Text(
@@ -38,8 +38,8 @@ class DoarPresencialPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20),
+              Text(
                 'A ONG se encontra nesse endereço!!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -47,11 +47,11 @@ class DoarPresencialPage extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               Text(
                 "Endereço:\n$endereco",
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   color: Color(0xFF005A2D),
                   fontWeight: FontWeight.bold,
