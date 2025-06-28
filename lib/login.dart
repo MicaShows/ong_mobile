@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-
 import 'package:flutter/services.dart';
-
+import 'package:http/http.dart' as http;
+import 'package:ong_mobile/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'cadastro.dart';
 
 class Login extends StatefulWidget {
@@ -14,15 +17,84 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _cpfController = TextEditingController();
-
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _senhaController = TextEditingController();
+
+// ===============================================================
+  @override
+  void initState() {
+    super.initState();
+    // _emailController.text = 'casamariamaia@org.br';
+    // _senhaController.text = 'qw1as1a@';
+    _emailController.text = 'leomar@org.br';
+    _senhaController.text = '123';
+  }
+
+  // Future<String?> _consultaApiSenha(String email, String senha) async {
+  Future<bool?> _consultaApiSenha(String email, String senha) async {
+    debugPrint('>>>>>>>>>>>> entrada');
+    debugPrint('>>>>>>>>>>>> dados: $email - $senha');
+    try {
+      String url = 'http://localhost:8080/api/v1/auth/authenticate';
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'email': email,
+          'password': senha,
+        }),
+      );
+      // >>>>>>>> DEBUG ANTES DO IF <<<<<<<<
+      debugPrint('>>>>>>>>>>>> statusCode: ${response.statusCode}');
+      debugPrint('>>>>>>>>>>>> body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        final accessToken = json['acess_token'];
+
+        final payload = parseJwt(accessToken);
+        final emailUsuario = payload['sub'];
+        final role = payload['role'];
+        print('role:  $role');
+        print('E½: $emailUsuario');
+
+        return true;
+      } else {
+        print("Erro ao conectar-se à API!");
+        return null;
+      }
+    } catch (e) {
+      print("Erro inesperado: ${e.toString()}");
+      return null;
+    }
+  }
+
+  Map<String, dynamic> parseJwt(String token) {
+    final parts = token.split('.');
+    if (parts.length != 3) {
+      throw Exception('Token JWT inválido');
+    }
+
+    final payload = parts[1];
+    final normalized = base64Url.normalize(payload);
+    final payloadMap = json.decode(utf8.decode(base64Url.decode(normalized)));
+
+    if (payloadMap is! Map<String, dynamic>) {
+      throw Exception('Payload inválido');
+    }
+
+    return payloadMap;
+  }
+
+// ===============================================================☻
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFEFFAF0), // Fundo verde claro
-
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -32,7 +104,6 @@ class _LoginState extends State<Login> {
               children: [
                 Image.asset(
                   'images/logoprincipal.jpg', // Ajuste conforme seu logo
-
                   height: 200,
                 ),
 
@@ -42,9 +113,7 @@ class _LoginState extends State<Login> {
                   'Bem-vindo (a) de volta.',
                   style: TextStyle(
                     color: Color(0xFF028C3E), // Verde escuro
-
                     fontWeight: FontWeight.bold,
-
                     fontSize: 18,
                   ),
                 ),
@@ -61,12 +130,11 @@ class _LoginState extends State<Login> {
 
                 const SizedBox(height: 30),
 
-                // CPF
-
+                // Email
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'CPF',
+                    'Email',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -74,32 +142,23 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 5),
 
                 TextFormField(
-                  controller: _cpfController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 11,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
-                    counterText: "", // Oculta o contador de caracteres
-
-                    hintText: '123.456.789-10',
-
+                    hintText: 'exemplo@email.com',
                     filled: true,
-
                     fillColor: Colors.white,
-
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Por favor, insira o CPF';
-                    } else if (value.length != 11) {
-                      return 'O CPF deve ter 11 números';
+                      return 'Por favor, insira o e-mail';
+                    } else if (!RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$')
+                        .hasMatch(value)) {
+                      return 'Insira um e-mail válido';
                     }
-
                     return null;
                   },
                 ),
@@ -107,7 +166,6 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 20),
 
                 // Senha
-
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -134,7 +192,6 @@ class _LoginState extends State<Login> {
                     if (value == null || value.isEmpty) {
                       return 'Por favor, insira a senha';
                     }
-
                     return null;
                   },
                 ),
@@ -160,14 +217,41 @@ class _LoginState extends State<Login> {
                 const SizedBox(height: 20),
 
                 // Botão "Entrar"
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Campos válidos!')),
+                        );
+                      }
+
+                      bool? resultado = await _consultaApiSenha(
+                        _emailController.text,
+                        _senhaController.text,
+                      );
+
+                      if (resultado!) {
+                        // Sucesso na autenticação
+                        // Ex: Navegar para outra tela
+                        print('Login bem-sucedido!');
+                        SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        await prefs.setBool(
+                            'isLoggedIn', true); // <- Salva o estado de login
+                        print('');
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomePage()),
+                        );
+                      } else {
+                        // Falha na autenticação
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Falha na autenticação.')),
                         );
                       }
                     },
@@ -182,7 +266,6 @@ class _LoginState extends State<Login> {
                       'Entrar',
                       style: TextStyle(
                         color: Colors.white, // Texto branco
-
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -190,13 +273,10 @@ class _LoginState extends State<Login> {
                 ),
 
                 const SizedBox(height: 10),
-
                 const Text('ou'),
-
                 const SizedBox(height: 10),
 
                 // Botão "Cadastre-se"
-
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -217,17 +297,18 @@ class _LoginState extends State<Login> {
                     child: const Text(
                       'Cadastre-se',
                       style: TextStyle(
-                        color: Colors.white, // Texto branco
-
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
+
                 // Botão "Continuar sem cadastro"
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context, false); // volta para a página inicial
+                    Navigator.pop(
+                        context, false); // volta para a página inicial
                   },
                   child: const Text(
                     'Continuar sem cadastro',

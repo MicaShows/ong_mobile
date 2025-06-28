@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
   bool mostrandoEstado = false;
 
   Future<void> carregaOngs() async {
-    final url = Uri.parse('http://localhost:8686/api/v1/doador/ong');
+    final url = Uri.parse('http://localhost:8080/api/v1/doador/ong');
 
     try {
       final response = await http.get(url);
@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     carregaOngs();
     _searchController.addListener(filterOngs);
+    print('OPA =====> $isLoggedIn');
   }
 
   void filterOngs() {
