@@ -63,6 +63,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     carregaOngs();
     _searchController.addListener(filterOngs);
+
+    filterOngs();
+
     print('OPA =====> $isLoggedIn');
   }
 
